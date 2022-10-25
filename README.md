@@ -15,7 +15,7 @@ Research under award DE-SC0018409*
 
 To use Gisa-PB just clone the directory 
 ```
-git clone <git.repo>
+git clone git@github.com:Gian77/GAAP-BP.git
 ```
 You will then need to 
 * Copy your raw reads file in the rawdata directory together with a md5sum file.
