@@ -19,9 +19,9 @@ git clone git@github.com:Gian77/GAAP-BP.git
 ```
 You will then need to 
 * Copy your raw reads file in the rawdata directory together with a md5sum file.
-* Install all the necessary tools through `conda` (please see the complete list below).
+* Install all the necessary tools through `conda` (please see the complete list of tools reported below).
 * Download the databases (please see below and the `config.yaml` file), and include the full paths into the config file.
-* Select your usage options (please see below).
+* Select all the **User options** (please see below).
 
 Then you should be good to go and run Gisa-PB by just 
 `sh Gisa-PB-v1.sh`
@@ -69,6 +69,7 @@ If not *numeric* (i.e. float) then `yes` or `no`.
 MASH=yes
 BAKTA=no
 EGGNOG=yes
+CHROMOSOMES=5
 ```
 
 ### **Software needed to fully run Gisa-PB on HPCC**
