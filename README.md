@@ -67,6 +67,7 @@ export GUNC_DB=/mnt/research/ShadeLab/Benucci/databases/gunc_db/gunc_db_progenom
 If not *numeric* (i.e. float) then `yes` or `no`.
 
 ```
+STRING=ccs
 MASH=yes
 BAKTA=no
 EGGNOG=yes
