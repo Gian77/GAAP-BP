@@ -33,6 +33,7 @@ The main project's directory is: `project_dir="/mnt/home/benucci/genome-pipe-bac
 
 > **_IMPORTANT NOTEs_**<br> 
 * This pipeline was born for running on the `HPCC` at Michigan State University on the `dev-amd20` (which as 128 cpus per node). If you want to run this piepline in any other systems it will require (possibly substantial) modification of the main, as well as, the accessory scripts.
+* The individual scripts in the `code` direcotry include the buy-in node priority `#SBATCH -A shade-cole-bonito`. If you do not have access to those priority nodes please remove that line in the individual scripts.
 * You can change the name of the project directory. However, you will not be able to change the other direcotiry names (i.e. `outputs` and `slurms`) becasue they are part of the workflow, unless you want to modify the individual scripts.
 * Please check the config file for options. A few script are additional and are can be avoided to save time.
 
