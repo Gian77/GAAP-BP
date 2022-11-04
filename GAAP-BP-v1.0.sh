@@ -118,7 +118,7 @@ jid20=`sbatch --dependency=afterok:$jid4:$jid6:$jid16 19_assemblygraph-bandage.s
 echo "$jid20: plotting genome network - differnet versions."
 
 # Optional annotation with Bakta https://github.com/oschwengers/bakta
-jid21=`sbatch --dependency=afterok:$jid12 15.2_standAnnotation-bakta.sb | cut -d" " -f 4`
+jid21=`sbatch --dependency=afterok:$jid12 15.2_optAnnotation-bakta.sb | cut -d" " -f 4`
 echo "$jid21: Additional annootation using the bakta pipeline."
 
 

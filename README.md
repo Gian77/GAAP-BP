@@ -29,7 +29,7 @@ Then you should be good to go and run Gisa-PB by just
 ### **Let's explore the settings in the `config.yaml` file**
 
 #### **Directories**
-The main project's directory is: `project_dir="/mnt/home/benucci/genome-pipe-bac-pb`. Of course, you will need to adjust the path to your HPCC user name. 
+The main project's directory is: `project_dir="/mnt/home/benucci/GAAP-BP/`. Of course, you will need to adjust the path to your HPCC user name. 
 
 > **_IMPORTANT NOTEs_**<br> 
 * This pipeline was born for running on the `HPCC` at Michigan State University on the `dev-amd20` (which as 128 cpus per node). If you want to run this piepline in any other systems it will require (possibly substantial) modification of the main, as well as, the accessory scripts.
@@ -60,7 +60,6 @@ busco_db="/mnt/research/ShadeLab/Benucci/databases/busco_db1121/bacteria_odb10"
 ```
 export GTDBTK_DATA_PATH=/mnt/research/ShadeLab/Benucci/databases/gtdb_tk/release207_v2
 export EGGNOG_DATA_DIR=/mnt/research/ShadeLab/Benucci/databases/emapperdb/
-export GUNC_DB=/mnt/research/ShadeLab/Benucci/databases/gunc_db/gunc_db_progenomes2.1.dmnd
 ```
 
 ### **User options**

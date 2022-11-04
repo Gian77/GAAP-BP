@@ -4,7 +4,7 @@
 #*********************** email: benucci[at]msu[dot]edu ***********************#
 
 echo "====> Reading GAAP-BP v. 1.0 config.yaml"
-project_dir="/mnt/home/benucci/genome-pipe-bac-pb"
+project_dir="/mnt/home/benucci/GAAP-BP"
 cd $project_dir/rawdata/
 
 # Databases
@@ -29,7 +29,6 @@ CHROMOSOMES=5
 # PATHs
 export GTDBTK_DATA_PATH=/mnt/research/ShadeLab/Benucci/databases/gtdb_tk/release207_v2
 export EGGNOG_DATA_DIR=/mnt/research/ShadeLab/Benucci/databases/emapperdb/
-export GUNC_DB=/mnt/research/ShadeLab/Benucci/databases/gunc_db/gunc_db_progenomes2.1.dmnd
 
 #NOTEs
 # * The larger kraken2 database, the better. For genome isolates the minikraken 
