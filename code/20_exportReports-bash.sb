@@ -1,0 +1,129 @@
+#!/bin/bash -login
+
+#SBATCH --time=00:10:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=64G
+#SBATCH --job-name 20export
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 20_exportResults-bash.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/20_exportReports-bash/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo "mkdir $project_dir/outputs/20_exportReports-bash/"; mkdir $project_dir/outputs/20_exportReports-bash/
+	echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+	echo -e "\n========== Sub-directories ==========\n"
+	for file in *.fastq;
+	do 
+		mkdir $project_dir/outputs/20_exportReports-bash/${file%.*}
+		cd $project_dir/outputs/20_exportReports-bash/${file%.*}/
+
+		echo -e "\n========== Extracting genome genus and species ==========\n"
+		genus=$(awk 'FNR == 2 {print}' \
+			$project_dir/outputs/11_completeness_checkm-gtdbtk/${file%.*}/gtdbtk_classification/gtdbtk.bac120.summary.tsv \
+			| cut -f 2 | cut -f 6 -d ";" | cut -f 3 -d "_")
+
+		species=$(awk 'FNR == 2 {print}' \
+			$project_dir/outputs/11_completeness_checkm-gtdbtk/${file%.*}/gtdbtk_classification/gtdbtk.bac120.summary.tsv \
+			| cut -f 2 | cut -f 7 -d ";" | cut -f 2 -d " ")
+
+		echo -e "\n========== collecting reports for genome: $file ==========\n"
+		cp $project_dir/outputs/01_rawquality_fast-QC/${file%.*}/* .
+		cp $project_dir/outputs/02_rawquality_nanostat/${file%.*}/nanostat.txt .
+		cp $project_dir/outputs/03_assembly_flye/${file%.*}/assembly_info.txt .
+		
+		if [ -d $project_dir/outputs/05_fixstart_circlator/${file%.*}/ ]; then
+			cp $project_dir/outputs/05_fixstart_circlator/${file%.*}/06.fixstart.fasta circulator_all.fasta
+			cp $project_dir/outputs/05_fixstart_circlator/${file%.*}/pilon_polish.log pilon_polish.log
+			cp $project_dir/outputs/05_fixstart_circlator/${file%.*}/pilon_polish.fasta pilon_polish.fasta
+			ln -s pilon_polish.fasta assembly.fasta
+		else
+			cp $project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon.fasta pilon.fasta
+			ln -s pilon.fasta assembly.fasta
+		fi
+
+		cp $project_dir/outputs/06_assemblyquality_quast/${file%.*}/quast.log .
+		cp $project_dir/outputs/06_assemblyquality_quast/${file%.*}/report.html quast_report.html
+		cp $project_dir/outputs/06_assemblyquality_quast/${file%.*}/report.txt quast_report.txt
+
+		cp $project_dir/outputs/07_assemblyeval_minimap2-qualimap/${file%.*}/qualimap_evaluation/genome_results.txt genome_results.qualimap
+		cp -R $project_dir/outputs/07_assemblyeval_minimap2-qualimap/${file%.*}/qualimap_evaluation/images_qualimapReport images_qualimapReport 
+		cp $project_dir/outputs/07_assemblyeval_minimap2-qualimap/${file%.*}/qualimap_evaluation/qualimapReport.html .
+		cp -R $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/ blast-blobtools/
+		cp $project_dir/outputs/09_plasmidcheck_platon/${file%.*}/racon_polish.log platon_racon_polish.log
+		[ -s $project_dir/outputs/10_plasmidcheck_mash/${file%.*}/plasmid_candidate_contig.list ] && cp $project_dir/outputs/10_plasmidcheck_mash/${file%.*}/plasmid_candidate_contig.list mash_plasmid_contigs.list
+		[ -s $project_dir/outputs/10_plasmidcheck_mash/${file%.*}/grep_plasmid.list ] && cp $project_dir/outputs/10_plasmidcheck_mash/${file%.*}/grep_plasmid.list mash_plasmid.list
+		[ -s $project_dir/outputs/10_plasmidcheck_mash/${file%.*}/plasmid_candidate_meta.tsv ] && cp $project_dir/outputs/10_plasmidcheck_mash/${file%.*}/plasmid_candidate_meta.tsv mash_plasmid_report.tsv 
+		cp $project_dir/outputs/11_completeness_checkm-gtdbtk/${file%.*}/checkm_stats.tsv .
+		cp $project_dir/outputs/11_completeness_checkm-gtdbtk/${file%.*}/gtdbtk_classification/gtdbtk.bac120.summary.tsv .
+		cp $project_dir/outputs/12_taxcalssabund_kraken2-bracken/${file%.*}/kraken2_report.txt .
+		cp $project_dir/outputs/12_taxcalssabund_kraken2-bracken/${file%.*}/kraken2_output.txt .
+		
+		cd $project_dir/outputs/13_rrnagenes_barrnap-metaxa/${file%.*}/
+			# find all files in the current directory with different basenames. -o means “OR”.
+			for name in $(find . -type f \( -name "rRNAs_barrnap.*" -o -name "rRNAs_metaxa.*" \) )
+			do  
+				[[ -s $name ]] && cp $name $project_dir/outputs/20_exportReports-bash/${file%.*}/
+			done
+		cd $project_dir/outputs/20_exportReports-bash/${file%.*}/
+
+		cp $project_dir/outputs/14_geneprediction_busco/${file%.*}/run_bacteria_odb10/short_summary.txt busco_short_summary.txt
+		cp $project_dir/outputs/14_geneprediction_busco/${file%.*}/prodigal_output/predicted_genes/predicted.faa prodigal_predicted.faa
+		cp $project_dir/outputs/14_geneprediction_busco/${file%.*}/prodigal_output/predicted_genes/predicted.fna prodigal_predicted.fna
+		cp $project_dir/outputs/15_geneannotation_prokka/${file%.*}/* .
+		
+		if [ -d $project_dir/outputs/15.2_standAnnotation_bakta/${file%.*}/ ]; then	
+			cp $project_dir/outputs/15.2_standAnnotation_bakta/${file%.*}/* .
+		fi		
+
+		if [ -d $project_dir/outputs/16_proteinAnnotation_eggnog/${file%.*}/ ]; then	
+			cp $project_dir/outputs/16_proteinAnnotation_eggnog/${file%.*}/* .
+		fi
+
+		cp $project_dir/outputs/17_ARgenecheck_abricate/${file%.*}/ABRicate_summary.tsv .
+		cp $project_dir/outputs/18_combinereports_multiqc/multiqc_report.html .
+		cp $project_dir/outputs/19_assemblygraph_bandage/${file%.*}/flye-assembly_graph.png .
+		[ -s $project_dir/outputs/19_assemblygraph_bandage/${file%.*}/circ-assembly_graph.png ] && cp $project_dir/outputs/19_assemblygraph_bandage/${file%.*}/circ-assembly_graph.png .
+
+		cd $project_dir/outputs/20_exportReports-bash/
+
+		mv ${file%.*}/ GAAP-BP_${genus}_${species}_${file%.*}_results/
+		tar -zcvf GAAP-BP_${genus}_${species}_${file%.*}_results.tar.gz --remove-files GAAP-BP_${genus}_${species}_${file%.*}_results/
+	done;
+
+	echo -e "\n========== Exporting slurms ==========\n"
+	# Compare run time with asked resourches
+	cd $project_dir/slurms/
+	for file in *.slurm
+		do paste <(tail -n33 $file | head -n1) <(tail -n24 $file | head -n1)
+	done > runtime.results
+
+	cp -R $project_dir/slurms $project_dir/outputs/20_exportReports-bash/GAAP-BP_slurms
+	cd $project_dir/outputs/20_exportReports-bash/
+	tar -zcvf GAAP-BP_slurms.tar.gz --remove-files GAAP-BP_slurms/
+fi
+
+# ls > file.list
+# tar -cvf reports.tar.gz --gzip --remove-files -T file.list
+# mv reports.tar.gz ../${file%.*}_reports.tar.gz
+#cp -R $project_dir/outputs/16_geneonthology_eggnog/${file%.*}/ eggnog_mapper
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/20_exportreports-bash.slurm

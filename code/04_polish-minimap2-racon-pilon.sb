@@ -1,0 +1,206 @@
+#!/bin/bash -login
+
+#SBATCH --time=01:59:00
+#SBATCH --nodes=1-2
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=64
+#SBATCH --mem=512G
+#SBATCH --job-name 4polish
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 04_polish-minimap2-racon-pilon.sb \n"
+
+echo -e "\n========== Sub-directoires ==========\n"
+if [ -d $project_dir/outputs/04_polish_minimap2-racon-pilon/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo "mkdir $project_dir/outputs/04_polish_minimap2-racon-pilon/"; mkdir $project_dir/outputs/04_polish_minimap2-racon-pilon/
+	echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+	echo -e "\n========== Polishing genome assembly with Racon ==========\n" 
+	echo -e "\n========== First round ==========\n" 
+	for file in *.fastq; do
+
+	mkdir $project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}
+
+		echo -e "\n========== minimap2 mapping for file: $file ==========\n" 
+		conda activate minimap2
+		echo -e "minimap2 version: `minimap2 --version`"
+		minimap2 \
+			-t $cores \
+			-x map-hifi \
+			$project_dir/outputs/03_assembly_flye/${file%.*}/assembly.fasta \
+			$file > \
+			$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.1.paf
+		conda deactivate
+
+		echo -e "\n========== racon polishing for file: $file ==========\n" 
+		conda activate racon
+		echo -e "racon version: `racon --version`" 
+		racon \
+			--threads $cores \
+			--match 3 --mismatch -5 --gap -4 --window-length 500 \
+			$file \
+			$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.1.paf \
+			$project_dir/outputs/03_assembly_flye/${file%.*}/assembly.fasta $file  > \
+			$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.1.fasta
+	done
+
+	echo -e "\n========== Second round ==========\n" 
+	for file in *.fastq 
+	do
+		echo -e "\n========== minimap2 mapping for file: $file ==========\n" 
+		conda activate minimap2
+		minimap2 \
+		-t $cores \
+		-x map-hifi \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.1.fasta $file > \
+			$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.2.paf
+		conda deactivate
+
+		echo -e "\n========== racon polishing for file: $file ==========\n" 
+		conda activate racon
+		racon \
+		--threads $cores \
+		--match 3 --mismatch -5 --gap -4 --window-length 500 \
+		$file \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.2.paf \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.1.fasta $file  > \
+			$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.2.fasta
+		conda deactivate
+	done
+
+	echo -e "\n========== Third polish round ==========\n" 
+	for file in *.fastq 
+	do
+		echo -e "\n========== minimap2 mapping for file: $file ==========\n" 
+		conda activate minimap2
+		minimap2 \
+		-t $cores \
+		-x map-hifi \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.2.fasta $file > \
+			$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.3.paf
+		conda deactivate
+
+		echo -e "\n========== racon polishing for file: $file ==========\n" 
+		conda activate racon
+		racon \
+		--threads $cores \
+		--match 3 --mismatch -5 --gap -4 --window-length 500 \
+		$file \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.3.paf \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.2.fasta $file  > \
+			$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.3.fasta
+		conda deactivate
+	done
+
+	echo -e "\n========== Forth polish round ==========\n" 
+	for file in *.fastq 
+	do
+		echo -e "\n========== minimap2 mapping for file: $file ==========\n" 
+		conda activate minimap2
+		minimap2 \
+		-t $cores \
+		-x map-hifi \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.3.fasta $file > \
+			$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.4.paf
+		conda deactivate
+
+		echo -e "\n========== racon polishing for file: $file ==========\n"
+		conda activate racon
+		racon \
+		--threads $cores \
+		--match 3 --mismatch -5 --gap -4 --window-length 500 \
+		$file \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.4.paf \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.3.fasta $file  > \
+			$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.4.fasta
+		conda deactivate
+	done
+
+
+	echo -e "\n========== Additional assembly polish with Pilon ==========\n" 
+	cd $project_dir/rawdata/
+
+	for file in *.fastq 
+	do
+		echo -e "\n========== minimap2 mapping for file: $file ==========\n" 
+		conda activate minimap2
+		echo -e "minimap2 version: `minimap2 --version`" 
+		minimap2 \
+		-t $cores \
+		-x map-hifi \
+		-a \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.4.fasta \
+		$file > \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.5.sam
+
+		echo -e "\n======= samtools view ========\n"
+		conda activate samtools
+		echo -e "samtools version: `samtools --version`" 
+		samtools view \
+		-@ $cores \
+		-h \
+		-b \
+		-S $project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.5.sam \
+		-o $project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.5.view.bam 
+
+		echo -e "\n======= samtools sort ========\n"
+		samtools sort \
+		-@ $cores \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.5.view.bam \
+		-o $project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.5.sorted.bam
+
+		echo -e "\n======= samtools index ========\n"
+		samtools index \
+		-@ $cores \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.5.sorted.bam
+		conda deactivate
+
+		echo -e "\n====== pilon ========\n"
+		conda activate pilon
+		echo -e "Pilon version: `pilon --version`" 
+		pilon \
+		--fix all \
+		--changes \
+		--verbose \
+		--genome $project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.4.fasta \
+		--unpaired $project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/minimap2_aling.5.sorted.bam \
+		--output $project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon 
+
+		conda deactivate
+	done;
+fi
+
+# racon -m, --match default: 3 score for matching bases
+# racon -x --mismatch default: -5 score for mismatching bases
+# racon -g, --gap default: -4 gap penalty (must be negative)
+# racon -w --window-length default: 500 size of window on which POA is performed
+
+# pilon --genome is the name of the input assembly to be corrected
+# pilon --frags is the alignment of the reads against the assembly
+# pilon --output is the name of the output prefix
+# pilon --fix is an option for types of corrections
+# pilon --mindepth gives a minimum read depth to use
+# pilon --changes produces an output file of the changes made
+# pilon --verbose prints information to the screen during the run
+
+# NOTES!
+# pilon --threads argument no longer supported; ignoring! Pilon version 1.24 Thu Jan 28 13:00:45 
+# Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+# I edited the file "/Users/user/anaconda/pkgs/pilon/bin/pilon" to have -Xmx256G
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/04_polish-minimap2-racon-pilon.slurm

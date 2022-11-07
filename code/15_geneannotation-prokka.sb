@@ -1,0 +1,83 @@
+#!/bin/bash -login
+
+#SBATCH --time=01:30:00
+#SBATCH --nodes=1-2
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=128
+#SBATCH --mem=512G  
+#SBATCH --job-name 15prokka
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 15_genePrediciton-prokka.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/15_geneannotation_prokka/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo "mkdir $project_dir/outputs/15_geneannotation_prokka/"; mkdir $project_dir/outputs/15_geneannotation_prokka/
+	echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+	echo -e "\n========== Annotating genes using Prokka ==========\n"
+	for file in *.fastq;
+	do
+		if [ -d $project_dir/outputs/05_fixstart_circlator/${file%.*}/ ]; then
+			source_file=$project_dir/outputs/05_fixstart_circlator/${file%.*}/pilon_polish.fasta		
+			echo -e "\n I am going to use the circularized assembly. \n"
+		else 
+			source_file=$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon.fasta	
+			echo -e "\n No curcular chromosome. I am going to use the high quality contigs. \n"
+		fi;
+
+		echo -e "\n========== Extracting taxonomies for file: $file ==========\n"
+		# awk to select the line first - same as | sed -n '2p' 
+		kingdom=$(awk 'FNR == 2 {print}' \
+		$project_dir/outputs/11_completeness_checkm-gtdbtk/${file%.*}/gtdbtk_classification/gtdbtk.bac120.summary.tsv \
+			| cut -f 2 | cut -f 1 -d ";" | cut -f 3 -d "_")
+		genus=$(awk 'FNR == 2 {print}' \
+		$project_dir/outputs/11_completeness_checkm-gtdbtk/${file%.*}/gtdbtk_classification/gtdbtk.bac120.summary.tsv \
+			| cut -f 2 | cut -f 6 -d ";" | cut -f 3 -d "_")
+		species=$(awk 'FNR == 2 {print}' \
+		$project_dir/outputs/11_completeness_checkm-gtdbtk/${file%.*}/gtdbtk_classification/gtdbtk.bac120.summary.tsv \
+			| cut -f 2 | cut -f 7 -d ";" | cut -f 2 -d " ")
+
+		echo $genus; echo $species
+
+		echo -e "\n========== Gene annotation for file: $file ==========\n"
+		conda activate prokka
+		echo -e "version of Prokka: `prokka --version`" 
+		mkdir $project_dir/outputs/15_geneannotation_prokka/${file%.*}
+		prokka \
+			--cpus $cores \
+			--kingdom $kingdom \
+			--genus $genus \
+			--species $species \
+			--force \
+			--usegenus \
+			--gcode 11 \
+			--rfam \
+			--compliant \
+			--addgenes \
+			--mincontiglen 500 \
+			--centre AIT \
+			--outdir $project_dir/outputs/15_geneannotation_prokka/${file%.*} $source_file
+		conda deactivate
+	done;
+fi
+
+# --prefix $strain \
+# --locustag $strain
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/15_geneannotation-prokka.slurm

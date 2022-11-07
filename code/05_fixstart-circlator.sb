@@ -1,0 +1,66 @@
+#!/bin/bash -login
+
+#SBATCH --time=03:59:00
+#SBATCH --nodes=1-2
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=64
+#SBATCH --mem=512G
+#SBATCH --job-name 5circlator
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 05_fixstart-circlator.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/05_fixstart_circlator/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo "mkdir $project_dir/outputs/05_fixstart_circlator/"; mkdir $project_dir/outputs/05_fixstart_circlator/
+	echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+	for file in *.fastq 
+	do
+		contigs_n=$(grep -c "^>contig_" $project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/racon_polish.4.fasta)
+		if [[ "$CHROMOSOMES" -ge "$contigs_n" ]]; then
+
+			echo -e "\n The genone has $contigs_n contigs. Try circularizing! \n"
+			
+			echo -e "\n========== Circlator ==========\n"
+			conda activate circlator
+			echo -e "Circlator version: `circlator version`" 
+
+			echo -e "\n========== full circlator pipe for file: $file ==========\n" 	
+			circlator all \
+				--threads $cores \
+				--verbose \
+				$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon.fasta $file \
+				$project_dir/outputs/05_fixstart_circlator/${file%.*}/
+
+			echo -e "\n========== Only circularize pilon-cleaned assembly: $file ==========\n" 
+			circlator fixstart \
+				$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon.fasta \
+				$project_dir/outputs/05_fixstart_circlator/${file%.*}/pilon_polish
+			
+			conda deactivate
+		else
+			echo -e "\n The genone has $contigs_n contigs. Skipping! \n"
+		fi;		
+
+	done;
+fi;
+
+# To extract file name with no extension use ${file%.*}
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/05_fixstart-circlator.slurm

@@ -1,0 +1,87 @@
+#!/bin/bash -login
+
+#SBATCH --time=01:59:00
+#SBATCH --nodes=1-2
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=96
+#SBATCH --mem=768G
+#SBATCH --job-name 8blobt
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 08_assemblyVisual-blast-blobt.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/08_assemblyvisual_blast_blobt/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo "mkdir $project_dir/outputs/08_assemblyvisual_blast_blobt/"; mkdir $project_dir/outputs/08_assemblyvisual_blast_blobt/
+	echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+	echo -e "\n========== Blast searches ==========\n"
+	for file in *.fastq;
+	do
+		if [ -d $project_dir/outputs/05_fixstart_circlator/${file%.*}/ ]; then
+			source_file=$project_dir/outputs/05_fixstart_circlator/${file%.*}/pilon_polish.fasta
+			echo -e "\n I am going to use the circularized assembly. \n"
+		else 
+			source_file=$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon.fasta
+			echo -e "\n No curcular chromosome. I am going to use the high quality contigs. \n"
+		fi;
+
+		echo -e "\n========== Blastn for file: $file ==========\n"
+		mkdir $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}
+		conda activate BLASTblobtool
+		echo -e "Version of BLAST: `blastn -version`" 
+		blastn \
+			-num_threads $cores \
+			-task megablast \
+			-query $source_file \
+			-db $NCBI_nt/nt \
+			-evalue 1e-5 \
+			-max_target_seqs 50 \
+			-max_hsps 10 \
+			-outfmt '6 qseqid staxids bitscore pident evalue length qlen slen qcovs qcovhsp sskingdoms scomnames sscinames sblastnames stitle' \
+			-out $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/BLASTblobtool_blast.out \
+
+		sed '1i #seq-id_query\ttax-id_subject\tbitscore\tidentity_percent\te-value\talignment_length\tquery_length\tsubject_length\tquery_coverage/subject\tquery_coverage/HSP\tkingdom\tcommon_name\tscientific_name\tblast_name\ttitle' $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/BLASTblobtool_blast.out > $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/BLAST_table.txt
+
+		echo -e "\n========== Parsing BLAST results... ==========\n"
+		echo -e "Version of blobtools: `blobtools --version`" 
+		blobtools create \
+			--nodes $NCBI_nt/nodes.dmp \
+			--names $NCBI_nt/names.dmp \
+			-i $source_file \
+			-b $project_dir/outputs/07_assemblyeval_minimap2-qualimap/${file%.*}/minimap2_alignment.sorted.bam \
+			-t $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/BLASTblobtool_blast.out \
+		 	-o $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/
+	
+		blobtools view \
+			--input $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/*.json \
+			--taxrule bestsum \
+			--rank all \
+			--hits \
+			--out $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/BLASTblobtool_bestscore.txt
+
+		blobtools plot \
+			--rank genus \
+			-i $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/*.json  \
+			-o $project_dir/outputs/08_assemblyvisual_blast_blobt/${file%.*}/
+		conda deactivate
+	done;
+fi
+
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/08_assemblyvisual-blast-blobt.slurm

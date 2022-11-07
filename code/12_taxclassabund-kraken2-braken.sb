@@ -1,0 +1,74 @@
+#!/bin/bash -login
+
+#SBATCH --time=01:59:00 
+#SBATCH --nodes=1-2
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=64
+#SBATCH --mem=256G
+#SBATCH --job-name 12kraken2
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 12_taxClassAbund-kraken2-bracken.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/12_taxcalssabund_kraken2-bracken/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo "mkdir $project_dir/outputs/12_taxcalssabund_kraken2-bracken/"; mkdir $project_dir/outputs/12_taxcalssabund_kraken2-bracken/
+	echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+	# Kraken/brachen databases https://benlangmead.github.io/aws-indexes/k2
+	echo -e "\n========== Kraken2 ==========\n"
+	for file in *.fastq;
+	do
+		if [ -d $project_dir/outputs/05_fixstart_circlator/${file%.*}/ ]; then
+			source_file=$project_dir/outputs/05_fixstart_circlator/${file%.*}/pilon_polish.fasta		
+			echo -e "\n I am going to use the circularized assembly. \n"
+		else 
+			source_file=$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon.fasta	
+			echo -e "\n No curcular chromosome. I am going to use the high quality contigs. \n"
+		fi;
+
+		echo -e "\n========== Taxonomic classificaiton for file: $file ==========\n"
+		echo -e "\n"	
+		conda activate kraken2
+		echo -e "version of Kraken2: `kraken2 --version`" 
+		mkdir $project_dir/outputs/12_taxcalssabund_kraken2-bracken/${file%.*}
+		
+		kraken2 \
+			--memory-mapping \
+			--threads $cores \
+			--db $minikraken2_db \
+			--output $project_dir/outputs/12_taxcalssabund_kraken2-bracken/${file%.*}/kraken2_output.txt \
+			--report $project_dir/outputs/12_taxcalssabund_kraken2-bracken/${file%.*}/kraken2_report.txt \
+			$source_file
+		conda deactivate
+
+		echo -e "\n========== Abundance estimation for file: $file ==========\n"
+		conda activate bracken
+		echo -e "version of Bracken: `bracken --help`" 
+		bracken \
+			-r 100 \
+			-l D \
+			-d $minikraken2_db \
+			-i $project_dir/outputs/12_taxcalssabund_kraken2-bracken/${file%.*}/kraken2_report.txt \
+			-o $project_dir/outputs/12_taxcalssabund_kraken2-bracken/${file%.*}/bracken_report.txt
+		conda deactivate
+	done;
+fi
+
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/12_taxcalssabund-kraken2-brachen.slurm

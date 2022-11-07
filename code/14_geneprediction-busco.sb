@@ -1,0 +1,66 @@
+#!/bin/bash -login
+
+#SBATCH --time=00:10:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=64
+#SBATCH --mem=384G
+#SBATCH --job-name 14busco
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 14_genePrediction-busco.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/14_geneprediction_busco/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo "mkdir $project_dir/outputs/14_geneprediction_busco/"; mkdir $project_dir/outputs/14_geneprediction_busco/
+	echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+	echo -e "\n========== Busco ==========\n"
+	for file in *.fastq;
+	do
+		if [ -d $project_dir/outputs/05_fixstart_circlator/${file%.*}/ ]; then
+			source_file=$project_dir/outputs/05_fixstart_circlator/${file%.*}/pilon_polish.fasta		
+			echo -e "\n I am going to use the circularized assembly. \n"
+		else 
+			source_file=$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon.fasta	
+			echo -e "\n No curcular chromosome. I am going to use the high quality contigs. \n"
+		fi;
+
+		echo -e "\n========== Gene prediction for file: $file ==========\n" 
+		#mkdir $project_dir/outputs/14_geneprediction_busco/${file%.*}/
+		conda activate busco
+		echo -e "version of Busco: `busco --version`" 
+
+		busco \
+			--force \
+			--cpu $cores \
+			-l $busco_db \
+			-m genome \
+			-i $source_file \
+			-o ${file%.*}
+
+		mv ${file%.*}/ $project_dir/outputs/14_geneprediction_busco/
+
+		conda deactivate
+	done;
+
+	mv busco_downloads/ $project_dir/outputs/14_geneprediction_busco/
+fi
+
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/14_geneprediction-busco.slurm

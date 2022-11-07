@@ -1,0 +1,71 @@
+#!/bin/bash -login
+
+#SBATCH --time=03:59:00 
+#SBATCH --nodes=1-2
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=128
+#SBATCH --mem=492G
+#SBATCH --job-name eggnog
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 16_proteinAnnotation-eggnog.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/06_assembly_spades/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	if [[ "$EGGNOG" == "yes" ]]; then
+		echo "mkdir $project_dir/outputs/16_proteinAnnotation_eggnog"; mkdir $project_dir/outputs/16_proteinAnnotation_eggnog
+		echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+		echo -e "\n========== Testing completeness through gene prediction ==========\n"
+		for file in *.fastq;
+		do 
+			echo -e "\n========== eggNOG-mapper for file: $file ==========\n"
+			mkdir $project_dir/outputs/16_proteinAnnotation_eggnog/${file%.*}
+			cd $project_dir/outputs/16_proteinAnnotation_eggnog/${file%.*}/
+
+			conda activate eggnog
+			echo -e "version of eggNOG-mapper: `emapper.py --version`" 
+		
+			emapper.py \
+				-i $project_dir/outputs/15_geneannotation_prokka/${file%.*}/PROKKA*.faa \
+				--cpu $cores \
+				--itype proteins \
+				-m diamond \
+				--dbmem \
+				--output $project_dir/outputs/16_proteinAnnotation_eggnog/${file%.*}/assembly \
+				--output_dir $project_dir/outputs/16_proteinAnnotation_eggnog/${file%.*}/
+
+			conda deactivate
+		done;
+	else
+		echo -e "\n You chose not to run EggNog mapper. \n"
+	fi;
+fi
+
+#--data_dir /mnt/research/ShadeLab/Benucci/databases/emapperdb/ \
+# --dmnd_db $dmnd_bac \
+#emapper.py \
+#-m no_search \
+#--annotate_hits_file test.emapper.seed_orthologs \
+#-o test_annot_2 \
+#--dbmem \
+#--report_orthologs \
+#--target_orthologs one2one \
+#--target_taxa 2,2157
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/16_proteinAnnotation-eggnog.slurm

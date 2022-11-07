@@ -1,0 +1,70 @@
+#!/bin/bash -login
+
+#SBATCH --time=00:15:00
+#SBATCH --nodes=1-2
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=128
+#SBATCH --mem=128G
+#SBATCH --job-name 13barrnap
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 13_extractRNAgenes-barrnap-metaxa.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/13_rrnagenes_barrnap-metaxa/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo "mkdir $project_dir/outputs/13_rrnagenes_barrnap-metaxa/"; mkdir $project_dir/outputs/13_rrnagenes_barrnap-metaxa/
+	echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+	echo -e "\n========== Extracting rRNA genes using barrnap==========\n"
+	for file in *.fastq;
+	do
+		if [ -d $project_dir/outputs/05_fixstart_circlator/${file%.*}/ ]; then
+			source_file=$project_dir/outputs/05_fixstart_circlator/${file%.*}/pilon_polish.fasta		
+			echo -e "\n I am going to use the circularized assembly. \n"
+		else 
+			source_file=$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon.fasta	
+			echo -e "\n No curcular chromosome. I am going to use the high quality contigs. \n"
+		fi;
+
+		echo -e "\n========== Extracting rRNA genes from genome with barrnap: $file ==========\n"
+		conda activate barrnap
+		echo -e "version of barrnap: `barrnap --version`" 
+		mkdir $project_dir/outputs/13_rrnagenes_barrnap-metaxa/${file%.*}
+		barrnap \
+			--threads $cores \
+			--kingdom bac \
+			--outseq $project_dir/outputs/13_rrnagenes_barrnap-metaxa/${file%.*}/rRNAs_barrnap.fasta < \
+				$source_file > \
+				$project_dir/outputs/13_rrnagenes_barrnap-metaxa/${file%.*}/rRNAs_barrnap.gff
+		conda deactivate
+
+		echo -e "\n========== Extracting rRNA genes from genome woth metaxa: $file ==========\n"
+		conda activate metaxa
+		metaxa2 \
+			--cpu $cores \
+			--complement F \
+			-t a,b \
+			-i $source_file \
+			-o $project_dir/outputs/13_rrnagenes_barrnap-metaxa/${file%.*}/rRNAs_metaxa.fasta
+		conda deactivate
+	done;
+fi
+
+#awk -F "|" '{print $1}' rRNAs_metaxa.fasta > rRNAs_clean_metaxa.fasta
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/13_rrnagenes_barrnap-metaxa.slurm

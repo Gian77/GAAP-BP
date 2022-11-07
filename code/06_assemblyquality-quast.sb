@@ -1,0 +1,52 @@
+#!/bin/bash -login
+
+#SBATCH --time=00:30:00 
+#SBATCH --nodes=1-2
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=128
+#SBATCH --mem=256G
+#SBATCH --job-name 6quast
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 06_assemblyQuality-quast.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/06_assemblyquality_quast/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo "mkdir $project_dir/outputs/06_assemblyquality_quast/"; mkdir $project_dir/outputs/06_assemblyquality_quast/
+	echo "cd $project_dir/rawdata/"; cd $project_dir/rawdata/
+
+	echo -e "\n========== Evaluating genome assembly using Quast ==========\n"
+	for file in *.fastq;
+	do
+		echo -e "\n========== quality evaluation for file: $file ==========\n" 
+		conda activate quast
+		echo -e "version of `quast --version`" 
+		quast.py \
+		--threads $cores \
+		--glimmer \
+		--report-all-metrics \
+		$project_dir/outputs/04_polish_minimap2-racon-pilon/${file%.*}/pilon.fasta \
+		-o $project_dir/outputs/06_assemblyquality_quast/${file%.*}/
+		conda deactivate
+	done;
+fi
+
+# WARNING: GeneMark tool (--gene-finding option) can't be started because of license limitations! 
+# I use --glimmer option to enable gene finding.
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/06_assemblyquality-quast.slurm
