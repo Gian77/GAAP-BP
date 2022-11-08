@@ -1,6 +1,6 @@
 # **GAAP-BP**
 
-*GAAP-BP v. 1.0* - **G**enome **A**ssembly and **A**nnotation **P**ipeline for **B**acteria **P**acbio<br>
+*GAAP-BP v.1.0* - **G**enome **A**ssembly and **A**nnotation **P**ipeline for **B**acteria **P**acbio<br>
 <br>
 
 MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.<br>
@@ -13,7 +13,7 @@ Research under award DE-SC0018409*
 
 ### **Installation**
 
-To use Gisa-PB just clone the directory 
+To use GAAP-BP just clone the directory 
 ```
 git clone git@github.com:Gian77/GAAP-BP.git
 ```
@@ -23,8 +23,8 @@ You will then need to
 * Download the databases (please see below and the `config.yaml` file), and include the full paths into the config file.
 * Select all the **User options** (please see below).
 
-Then you should be good to go and run Gisa-PB by just 
-`sh Gisa-PB-v1.sh`
+Then you should be good to go and run GAAP-BP by just 
+`sh GAAP-BP-v1.0.sh`
 
 ### **Let's explore the settings in the `config.yaml` file**
 
@@ -73,7 +73,7 @@ EGGNOG=yes
 CHROMOSOMES=5
 ```
 
-### **Software needed to fully run Gisa-PB on HPCC**
+### **Software needed to fully run GAAP-BP on HPCC**
 
 Please install via conda (or use the binaries in the HPPC) of all these software below. 
 * ##### [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
