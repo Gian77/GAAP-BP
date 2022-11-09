@@ -114,5 +114,5 @@ Please install via conda (or use the binaries in the HPPC) of all these software
 * ##### [Bandage](https://github.com/rrwick/Bandage)
 
 ### **Acknowledgements**
-Many thanks to the [Institute for Cyber-Enabled Research (ICER)](https://icer.msu.edu/) for helping troubshoting SLURM, the [DOE Joint Genome Institute](https://jgi.doe.gov/) for providing the sequence data, methods, and metadata support, the whole crew at the [Shade lab](https://ashley17061.wixsite.com/shadelab) for brainstorming over methods and tools, and Dr. Livio Antonielli at the [AIT Austrian Institute of Technology GmbH](https://www.ait.ac.at/en/) for the insiteful discussions and bioiformatic suggestions.
+Many thanks to the [Institute for Cyber-Enabled Research (ICER)](https://icer.msu.edu/) for helping troubshoting SLURM, the [DOE Joint Genome Institute](https://jgi.doe.gov/) for providing the sequence data, methods, and metadata support, the whole crew at the [Shade lab](https://ashley17061.wixsite.com/shadelab) for brainstorming over methods and tools, and my good friend and colleague, Dr. Livio Antonielli at the [AIT Austrian Institute of Technology GmbH](https://www.ait.ac.at/en/) for the insiteful discussions and bioiformatic suggestions.
 
