@@ -80,7 +80,7 @@ The `BAKTA` variable is for running the *bakta* annotation pipeline.
 The `EGGNOG` variable is to run *eggnog-mapper* to re-classify the proteins detected by *Prokka*.
 The `CHROMOSOMES` variable is for circularize the genome or the chromosomes. If the number of contigs is less than the number of specified chromosomes then *Circlator* is run on the contings to circularize them.
 
-!For detailes on the tools mentioned above see the bottom of the page.
+!For detailes on the tools mentioned above see below.
 
 
 ### **Software needed to fully run GAAP-BP on HPCC**
@@ -112,4 +112,7 @@ Please install via conda (or use the binaries in the HPPC) of all these software
 * ##### [ABRicate](https://github.com/tseemann/abricate)
 * ##### [MultiQC](https://github.com/ewels/MultiQC)
 * ##### [Bandage](https://github.com/rrwick/Bandage)
+
+### **Acknowledgements**
+Many thanks to the [Institute for Cyber-Enabled Research (ICER)](https://icer.msu.edu/) for helping troubshoting SLURM, the [DOE Joint Genome Institute](https://jgi.doe.gov/) for providing the sequence data, methods, and metadata support, the whole crew at the [Shade lab](https://ashley17061.wixsite.com/shadelab) for brainstorming over methods and tools, and Dr. Livio Antonielli at the [AIT Austrian Institute of Technology GmbH](https://www.ait.ac.at/en/) for the insiteful discussions and bioiformatic suggestions.
 
