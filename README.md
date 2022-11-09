@@ -7,9 +7,9 @@ MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.<br>
 email: *benucci[at]msu[dot]edu*<br>
 Gisa-BP v.1, October 2022<br>
 
-*This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center,
-U.S. Department of Energy, Office of Science, Office of Biological and Environmental 
-Research under award DE-SC0018409*
+##*This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center*,
+##*U.S. Department of Energy, Office of Science, Office of Biological and Environmental*
+##*Research under award DE-SC0018409*
 
 ### **Installation**
 
@@ -32,7 +32,7 @@ Then you should be good to go and run GAAP-BP by just
 The main project's directory is: `project_dir="/mnt/home/benucci/GAAP-BP/`. Of course, you will need to adjust the path to your HPCC user name. 
 
 > **_IMPORTANT NOTEs_**<br> 
-* This pipeline was born for running on the `HPCC` at Michigan State University on the `dev-amd20` (which as 128 cpus per node). If you want to run this piepline in any other systems it will require (possibly substantial) modification of the main, as well as, the accessory scripts.
+* This pipeline was born for running on the `HPCC` at *Michigan State University* on the `dev-amd20` (which as 128 cpus per node). If you want to run this piepline in any other systems it will require (possibly substantial) modification of the main, as well as the accessory scripts, present in the `/mnt/home/benucci/GAAP-BP/code/` direcotry.
 * The individual scripts in the `code` direcotry include the buy-in node priority `#SBATCH -A shade-cole-bonito`. If you do not have access to those priority nodes please remove that line in the individual scripts.
 * You can change the name of the project directory. However, you will not be able to change the other direcotiry names (i.e. `outputs` and `slurms`) becasue they are part of the workflow, unless you want to modify the individual scripts.
 * Please check the config file for options. A few script are additional and are can be avoided to save time.
@@ -45,7 +45,9 @@ cd $project_dir/rawdata/
 
 #### **Databases**
 Find a place in your lab space (or in your home directory) where to put all the needed databases.
-Correct the directory hierarchy according to your HPCC account name.
+Correct the directory hierarchy according to your HPCC account name. For example, in my case all the
+databases are in `/mnt/research/ShadeLab/Benucci/databases/`.
+
 ```
 NCBI_nt="/mnt/research/ShadeLab/Benucci/databases/ncbi_nt1121"
 kraken2_db="/mnt/research/ShadeLab/Benucci/databases/kraken2_db/"
@@ -72,6 +74,14 @@ BAKTA=no
 EGGNOG=yes
 CHROMOSOMES=5
 ```
+The `STRING` variable differentiate `hifi` form `raw` pacbio reads. Usually `ccs` is present in the raw file name, when found it activates the hifi mode in the *Flye* assembler. If you want to differentiate using a different string you can change it accordingly.
+The `MASH` variable is for running plasmid detection using *Mash*.
+The `BAKTA` variable is for running the *bakta* annotation pipeline.
+The `EGGNOG` variable is to run *eggnog-mapper* to re-classify the proteins detected by *Prokka*.
+The `CHROMOSOMES` variable is for circularize the genome or the chromosomes. If the number of contigs is less than the number of specified chromosomes then *Circlator* is run on the contings to circularize them.
+
+!For detailes on the tools mentioned above see the bottom of the page.
+
 
 ### **Software needed to fully run GAAP-BP on HPCC**
 
