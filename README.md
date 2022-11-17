@@ -11,6 +11,9 @@ Gisa-BP v.1, October 2022<br>
 ##*U.S. Department of Energy, Office of Science, Office of Biological and Environmental*
 ##*Research under award DE-SC0018409*
 
+> **_IMPORTANT NOTE_**<br>
+#### This pipeline was built for running on a cluster computer that runs SLURM (Slurm Workload Manager) job scheduler. Any other use will require substantial modification of the code.
+
 ### **Installation**
 
 To use GAAP-BP just clone the directory 
