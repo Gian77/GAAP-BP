@@ -12,7 +12,7 @@ Gisa-BP v.1, October 2022<br>
 ##*Research under award DE-SC0018409*
 
 > **_IMPORTANT NOTE_**<br>
-#### This pipeline was built for running on a cluster computer that runs SLURM (Slurm Workload Manager) job scheduler. Any other use will require substantial modification of the code.
+> #### This pipeline was built for running on a cluster computer that runs SLURM (Slurm Workload Manager) job scheduler. Any other use will require substantial modification of the code.
 
 ### **Installation**
 
@@ -34,11 +34,11 @@ Then you should be good to go and run GAAP-BP by just
 #### **Directories**
 The main project's directory is: `project_dir="/mnt/home/benucci/GAAP-BP/`. Of course, you will need to adjust the path to your HPCC user name. 
 
-> **_IMPORTANT NOTEs_**<br> 
-* This pipeline was born for running on the `HPCC` at *Michigan State University* on the `dev-amd20` (which as 128 cpus per node). If you want to run this piepline in any other systems it will require (possibly substantial) modification of the main, as well as the accessory scripts, present in the `/mnt/home/benucci/GAAP-BP/code/` direcotry.
-* The individual scripts in the `code` direcotry include the buy-in node priority `#SBATCH -A shade-cole-bonito`. If you do not have access to those priority nodes please remove that line in the individual scripts.
-* You can change the name of the project directory. However, you will not be able to change the other direcotiry names (i.e. `outputs` and `slurms`) becasue they are part of the workflow, unless you want to modify the individual scripts.
-* Please check the config file for options. A few script are additional and are can be avoided to save time.
+> **_IMPORTANT NOTE_**<br> 
+> * This pipeline was born for running on the `HPCC` at *Michigan State University* on the `dev-amd20` (which as 128 cpus per node). If you want to run this piepline in any other systems it will require (possibly substantial) modification of the main, as well as the accessory scripts, present in the `/mnt/home/benucci/GAAP-BP/code/` direcotry.
+> * The individual scripts in the `code` direcotry include the buy-in node priority `#SBATCH -A shade-cole-bonito`. If you do not have access to those priority nodes please remove that line in the individual scripts.
+> * You can change the name of the project directory. However, you will not be able to change the other direcotiry names (i.e. `outputs` and `slurms`) becasue they are part of the workflow, unless you want to modify the individual scripts.
+> * Please check the config file for options. A few script are additional and are can be avoided to save time.
 
 #### **Default to the `rawdata` directory**
 When the config is sourced it defaults to the `rawdata` project directory
