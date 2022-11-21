@@ -7,9 +7,9 @@ MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.<br>
 email: *benucci[at]msu[dot]edu*<br>
 Gisa-BP v.1, October 2022<br>
 
-##*This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center*,
-##*U.S. Department of Energy, Office of Science, Office of Biological and Environmental*
-##*Research under award DE-SC0018409*
+## *This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center*,
+## *U.S. Department of Energy, Office of Science, Office of Biological and Environmental*
+## *Research under award DE-SC0018409*
 
 > **_IMPORTANT NOTE_**<br>
 > #### This pipeline was built for running on a cluster computer that runs SLURM (Slurm Workload Manager) job scheduler. Any other use will require substantial modification of the code.
