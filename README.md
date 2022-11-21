@@ -9,7 +9,7 @@ Gisa-BP v.1, October 2022<br>
 
 ## *This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center, U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research under award DE-SC0018409*
 
-> **_IMPORTANT NOTE_**<br>
+> __Warning__<br>
 > ### **This pipeline was built for running on a cluster computer that runs SLURM (Slurm Workload Manager) job scheduler. Any other use will require substantial modification of the code.**
 > 
 
@@ -33,8 +33,8 @@ Then you should be good to go and run GAAP-BP by just
 #### **Directories**
 The main project's directory is: `project_dir="/mnt/home/benucci/GAAP-BP/`. Of course, you will need to adjust the path to your HPCC user name. 
 
-> **_IMPORTANT NOTE_**<br> 
-> * This pipeline run using SLURM (please see bove). **Resourches of each individual scripts present in the `/mnt/home/benucci/GAAP-BP/code/` direcotry must be adjusted to the amount of data you want to run for each pipelien round.**
+> __Note__ <br> 
+> * This pipeline run using SLURM (please see bove). **Resourches of each individual job scripts present in the `/mnt/home/benucci/GAAP-BP/code/` directory MUST be adjusted to the amount of data you want to run for each pipeline run.**
 > * The individual scripts in the `code` direcotry include the buy-in node priority `#SBATCH -A shade-cole-bonito`. If you do not have access to those priority nodes please remove that line in the individual scripts.
 > * You can change the name of the `project_dir`, but by default is going to be `GAAP-BP`. Subdirectories such as `outputs` and `slurms` are part of the workflow, and should be left as they are.
 > * Please check the config file for options. A few script are additional and are can be avoided to save time.
