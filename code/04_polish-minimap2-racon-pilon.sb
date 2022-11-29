@@ -201,6 +201,6 @@ fi
 # I edited the file "/Users/user/anaconda/pkgs/pilon/bin/pilon" to have -Xmx256G
 echo -e "\n========== Sbatch log ==========\n"
 echo -e "\n Current directory: `pwd` \n"
-echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+echo -e "\n `sacct -u $MSUusername -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
 scontrol show job $SLURM_JOB_ID
 mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/04_polish-minimap2-racon-pilon.slurm

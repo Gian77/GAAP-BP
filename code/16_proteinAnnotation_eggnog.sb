@@ -54,18 +54,8 @@ else
 	fi;
 fi
 
-#--data_dir /mnt/research/ShadeLab/Benucci/databases/emapperdb/ \
-# --dmnd_db $dmnd_bac \
-#emapper.py \
-#-m no_search \
-#--annotate_hits_file test.emapper.seed_orthologs \
-#-o test_annot_2 \
-#--dbmem \
-#--report_orthologs \
-#--target_orthologs one2one \
-#--target_taxa 2,2157
 echo -e "\n========== Sbatch log ==========\n"
 echo -e "\n Current directory: `pwd` \n"
-echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+echo -e "\n `sacct -u $MSUusername -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
 scontrol show job $SLURM_JOB_ID
 mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/16_proteinAnnotation-eggnog.slurm

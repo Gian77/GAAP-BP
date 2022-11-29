@@ -2,10 +2,13 @@
 											
 #********** MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D. **********#
 #*********************** email: benucci[at]msu[dot]edu ***********************#
-
 echo "====> Reading GAAP-BP v. 1.0 config.yaml"
+
 project_dir="/mnt/home/benucci/GAAP-BP"
 cd $project_dir/rawdata/
+
+# Change your MSUusername based on MSU ID 
+MSUusername="benucci"
 
 # Databases
 NCBI_nt="/mnt/research/ShadeLab/Benucci/databases/ncbi_nt1121"
