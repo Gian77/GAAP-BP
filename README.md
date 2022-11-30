@@ -83,7 +83,7 @@ BAKTA=no
 EGGNOG=yes
 CHROMOSOMES=5
 ```
-The `STRING` variable differentiate `hifi` form `raw` pacbio reads. Usually `ccs` is present in the raw file name, when found it activates the hifi mode in the *Flye* assembler. If you want to differentiate using a different string you can change it accordingly.
+The `RAWFILES` variable is about the raw reads format. If `fastq` or `fastq.gz` will be decompressed, if `bam`, then `hifi` reads will be extarcted form `raw` pacbio reads.
 The `MASH` variable is for running plasmid detection using *Mash*.
 The `BAKTA` variable is for running the *bakta* annotation pipeline.
 The `EGGNOG` variable is to run *eggnog-mapper* to re-classify the proteins detected by *Prokka*.

@@ -22,12 +22,12 @@ phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 bakta_db="/mnt/research/ShadeLab/Benucci/databases/bakta_db/db"
 #dmnd_bac="/mnt/research/ShadeLab/Benucci/databases/emapperdb/eggdb_bacteria.dmnd"
 
-# Run options
-STRING=ccs
-MASH=yes
-BAKTA=no
-EGGNOG=yes
-CHROMOSOMES=5
+# Run options - you must adjust these to your needs!!!
+RAWFILES=bam # fastq or bam
+MASH=yes # yes or no
+BAKTA=no # yes or no
+EGGNOG=yes # yes or no
+CHROMOSOMES=5 # an integer number
 
 # PATHs
 export GTDBTK_DATA_PATH=/mnt/research/ShadeLab/Benucci/databases/gtdb_tk/release207_v2
