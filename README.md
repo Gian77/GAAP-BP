@@ -86,11 +86,9 @@ The `BAKTA` variable is for running the *bakta* annotation pipeline.
 The `EGGNOG` variable is to run *eggnog-mapper* to re-classify the proteins detected by *Prokka*.
 The `CHROMOSOMES` variable is for circularize the genome or the chromosomes. If the number of contigs is less than the number of specified chromosomes then *Circlator* is run on the contings to circularize them.
 
-!For detailes on the tools mentioned above see below.
-
 ### **Software needed to fully run GAAP-BP on HPCC**
 
-Please install via conda (or use the binaries in the HPPC) of all these software below: 
+Please install via conda (strongly suggested) all these tools listed below: 
 ##### **[FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [NanoStat](https://github.com/wdecoster/nanostat), [Flye](https://github.com/fenderglass/Flye), [Minimap2](https://github.com/lh3/minimap2), [Racon](https://github.com/isovic/racon), [Pilon](https://github.com/broadinstitute/pilon/wiki), [Circlator](https://sanger-pathogens.github.io/circlator/), [quast](http://bioinf.spbau.ru/quast), [qualimap](https://github.com/EagleGenomics-cookbooks/QualiMap), [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs), [BlobTools](https://github.com/DRL/blobtools), [Platon](https://github.com/oschwengers/platon), [Mash](https://github.com/marbl/Mash), [Kraken 2](https://ccb.jhu.edu/software/kraken2/), [Bracken](https://github.com/jenniferlu717/Bracken), [CheckM](https://ecogenomics.github.io/CheckM/), [GTDB-Tk](https://github.com/Ecogenomics/GTDBTk), [Barrnap](https://github.com/tseemann/barrnap), [Metaxa2](https://microbiology.se/software/metaxa2/), [eggNOG](https://github.com/eggnogdb), [Prokka](https://github.com/tseemann/prokka), [Bakta](https://github.com/oschwengers/bakta), [BUSCO](https://busco.ezlab.org/), [ABRicate](https://github.com/tseemann/abricate), [MultiQC](https://github.com/ewels/MultiQC), [Bandage](https://github.com/rrwick/Bandage), [pbccs](https://github.com/PacificBiosciences/pbbioconda)**
 
 ### **Acknowledgements**
