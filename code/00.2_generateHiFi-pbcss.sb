@@ -1,0 +1,42 @@
+#!/bin/bash -login
+
+#SBATCH --time=03:59:00
+#SBATCH --nodes=2
+#SBATCH --ntasks=2
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=64G
+#SBATCH --job-name 002ccs
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "GAAP-BP v. 1.0 - Genome Assembly and Annotation Pipeline for Bacteria Pacbio
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: generateCCS-pbccs.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+echo -e "mkdir $project_dir/outputs/\n mkdir $project_dir/slurms/\n"
+mkdir -p $project_dir/outputs/; mkdir -p $project_dir/slurms/
+
+echo -e "\n========== Decompress files ==========\n"
+for file in *.bam; do
+
+	conda activate pbccs
+	echo -e "pbccs version: `ccs --version`"
+	
+	ccs $file ${file//.bam/ccs.fastq} -j $cores
+
+done
+
+# https://github.com/PacificBiosciences/pbbioconda
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/002_generateHiFi-pbccs.slurm

@@ -60,7 +60,6 @@ databases are in `/mnt/research/ShadeLab/Benucci/databases/`.
 ```
 NCBI_nt="/mnt/research/ShadeLab/Benucci/databases/ncbi_nt1121"
 kraken2_db="/mnt/research/ShadeLab/Benucci/databases/kraken2_db/"
-minikraken2_db="/mnt/research/ShadeLab/Benucci/databases/minikraken2_db/"
 dmnd_bac="/mnt/research/ShadeLab/Benucci/databases/emapperdb/eggdb_bacteria.dmnd"
 platon_db="/mnt/research/ShadeLab/Benucci/databases/platon_db/db/"
 mash_plsdb="/mnt/research/ShadeLab/Benucci/databases/plasmid_db/plsdb.msh"
@@ -73,15 +72,13 @@ export GTDBTK_DATA_PATH=/mnt/research/ShadeLab/Benucci/databases/gtdb_tk/release
 export EGGNOG_DATA_DIR=/mnt/research/ShadeLab/Benucci/databases/emapperdb/
 ```
 
-### **User options**
-If not *numeric* (i.e. float) then `yes` or `no`.
-
+## Run options - you must adjust these to your needs!
 ```
-STRING=ccs
-MASH=yes
-BAKTA=no
-EGGNOG=yes
-CHROMOSOMES=5
+RAWFILES=bam # fastq or bam
+MASH=yes # yes or no
+BAKTA=no # yes or no
+EGGNOG=yes # yes or no
+CHROMOSOMES=5 # an integer number
 ```
 The `RAWFILES` variable is about the raw reads format. If `fastq` or `fastq.gz` will be decompressed, if `bam`, then `hifi` reads will be extarcted form `raw` pacbio reads.
 The `MASH` variable is for running plasmid detection using *Mash*.
