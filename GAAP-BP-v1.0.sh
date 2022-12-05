@@ -50,8 +50,13 @@ cd $project_dir/code/
 echo -e "\n Submitting jobs to cue, one after another...\n"
 
 echo -e "\n========== Prefiltering ==========\n" 
-jid1=`sbatch 00_decompressfiles.sb | cut -d " " -f 4`
-echo "$jid1: Decompressing files and match md5sum codes."  
+if [[ "$RAWFILES" == "fastq" ]]; then
+	jid1=`sbatch 00.1_decompressfiles.sb | cut -d " " -f 4`
+	echo "$jid1: Decompressing fastq files."  
+elif [[ "$RAWFILES" == "bam" ]]; then
+	jid1=`sbatch 00.2_generateHiFi-pbcss.sb | cut -d " " -f 4`
+	echo "$jid1: Generate ccs (i.e. Pacbio HiFi) reads."  
+fi
 
 jid2=`sbatch --dependency=afterok:$jid1 01_rawquality-fastqc.sb | cut -d" " -f 4`
 echo "$jid2: Check raw reads quality with fastqc."

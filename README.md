@@ -91,36 +91,10 @@ The `CHROMOSOMES` variable is for circularize the genome or the chromosomes. If 
 
 !For detailes on the tools mentioned above see below.
 
-
 ### **Software needed to fully run GAAP-BP on HPCC**
 
-Please install via conda (or use the binaries in the HPPC) of all these software below. 
-* ##### [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
-* ##### [NanoStat](https://github.com/wdecoster/nanostat)
-* ##### [Flye](https://github.com/fenderglass/Flye)
-* ##### [Minimap2](https://github.com/lh3/minimap2)
-* ##### [Racon](https://github.com/isovic/racon)
-* ##### [Pilon](https://github.com/broadinstitute/pilon/wiki)
-* ##### [Circlator](https://sanger-pathogens.github.io/circlator/)
-* ##### [quast](http://bioinf.spbau.ru/quast)
-* ##### [qualimap](https://github.com/EagleGenomics-cookbooks/QualiMap)
-* ##### [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs)
-* ##### [BlobTools](https://github.com/DRL/blobtools)
-* ##### [Platon](https://github.com/oschwengers/platon)
-* ##### [Mash](https://github.com/marbl/Mash)
-* ##### [Kraken 2](https://ccb.jhu.edu/software/kraken2/)
-* ##### [Bracken](https://github.com/jenniferlu717/Bracken)
-* ##### [CheckM](https://ecogenomics.github.io/CheckM/)
-* ##### [GTDB-Tk](https://github.com/Ecogenomics/GTDBTk)
-* ##### [Barrnap](https://github.com/tseemann/barrnap)
-* ##### [Metaxa2](https://microbiology.se/software/metaxa2/)
-* ##### [eggNOG](https://github.com/eggnogdb)
-* ##### [Prokka](https://github.com/tseemann/prokka)
-* ##### [Bakta](https://github.com/oschwengers/bakta)
-* ##### [BUSCO](https://busco.ezlab.org/)
-* ##### [ABRicate](https://github.com/tseemann/abricate)
-* ##### [MultiQC](https://github.com/ewels/MultiQC)
-* ##### [Bandage](https://github.com/rrwick/Bandage)
+Please install via conda (or use the binaries in the HPPC) of all these software below: 
+##### **[FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [NanoStat](https://github.com/wdecoster/nanostat), [Flye](https://github.com/fenderglass/Flye), [Minimap2](https://github.com/lh3/minimap2), [Racon](https://github.com/isovic/racon), [Pilon](https://github.com/broadinstitute/pilon/wiki), [Circlator](https://sanger-pathogens.github.io/circlator/), [quast](http://bioinf.spbau.ru/quast), [qualimap](https://github.com/EagleGenomics-cookbooks/QualiMap), [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs), [BlobTools](https://github.com/DRL/blobtools), [Platon](https://github.com/oschwengers/platon), [Mash](https://github.com/marbl/Mash), [Kraken 2](https://ccb.jhu.edu/software/kraken2/), [Bracken](https://github.com/jenniferlu717/Bracken), [CheckM](https://ecogenomics.github.io/CheckM/), [GTDB-Tk](https://github.com/Ecogenomics/GTDBTk), [Barrnap](https://github.com/tseemann/barrnap), [Metaxa2](https://microbiology.se/software/metaxa2/), [eggNOG](https://github.com/eggnogdb), [Prokka](https://github.com/tseemann/prokka), [Bakta](https://github.com/oschwengers/bakta), [BUSCO](https://busco.ezlab.org/), [ABRicate](https://github.com/tseemann/abricate), [MultiQC](https://github.com/ewels/MultiQC), [Bandage](https://github.com/rrwick/Bandage), [pbccs](https://github.com/PacificBiosciences/pbbioconda)**
 
 ### **Acknowledgements**
 Many thanks to the [Institute for Cyber-Enabled Research (ICER)](https://icer.msu.edu/) for helping troubshoting SLURM, the [DOE Joint Genome Institute](https://jgi.doe.gov/) for providing the sequence data, methods, and metadata support, the whole crew at the [Shade lab](https://ashley17061.wixsite.com/shadelab) for brainstorming over methods and tools, and my good friend and colleague, Dr. Livio Antonielli at the [AIT Austrian Institute of Technology GmbH](https://www.ait.ac.at/en/) for the insiteful discussions and bioiformatic suggestions.

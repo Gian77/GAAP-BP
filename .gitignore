@@ -1,1 +1,3 @@
-# what should not be committed
+# No tracking
+rawdata/*fastq
+rawdata/*bam
