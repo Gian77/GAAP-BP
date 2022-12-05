@@ -126,7 +126,6 @@ echo "$jid20: plotting genome network - differnet versions."
 jid21=`sbatch --dependency=afterok:$jid12 15.2_optAnnotation-bakta.sb | cut -d" " -f 4`
 echo "$jid21: Additional annootation using the bakta pipeline."
 
-
 if [[ "$BAKTA" == "yes" ]]; then
 	jid22=`sbatch --dependency=afterok:$jid1:$jid2:$jid3:$jid4:$jid5:$jid6:$jid7:$jid8:$jid9:$jid10:$jid12:$jid13:$jid14:$jid15:$jid16:$jid17:$jid18:$jid19:$jid20:$jid21 20_exportReports-bash.sb | cut -d" " -f 4`
 	echo "$jid22: Copy and zip all reports for further use."
