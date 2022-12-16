@@ -78,13 +78,13 @@ RAWFILES=bam # fastq or bam
 MASH=yes # yes or no
 BAKTA=no # yes or no
 EGGNOG=yes # yes or no
-CHROMOSOMES=5 # an integer number
+CHROMOSOMES=2 # an integer number
 ```
 The `RAWFILES` variable is about the raw reads format. If `fastq` or `fastq.gz` will be decompressed, if `bam`, then `hifi` reads will be extarcted form `raw` pacbio reads.
-The `MASH` variable is for running plasmid detection using *Mash*.
-The `BAKTA` variable is for running the *bakta* annotation pipeline.
-The `EGGNOG` variable is to run *eggnog-mapper* to re-classify the proteins detected by *Prokka*.
-The `CHROMOSOMES` variable is for circularize the genome or the chromosomes. If the number of contigs is less than the number of specified chromosomes then *Circlator* is run on the contings to circularize them.
+The `MASH` variable is for running plasmid detection using *Mash* (default `yes`).
+The `BAKTA` variable is for running the *bakta* annotation pipeline (default `no`).
+The `EGGNOG` variable is to run *eggnog-mapper* to re-classify the proteins detected by *Prokka* (default `yes`).
+The `CHROMOSOMES` variable is for circularize the genome (default `2`, one contig is the bacterial genome and he other contig is the plasmid). However, It is known that some bacteria have multiple circular cromosomes (e.g., *Rhodobacter sphaeroides*), for reference see [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3348396/). Feel free to increase to how many chromosomes you think the tazon you are working on may have. If the number of contigs is less than the number of specified chromosomes then *Circlator* is run on the contings to circularize them.
 
 ### **Software needed to fully run GAAP-BP on HPCC**
 

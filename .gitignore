@@ -1,3 +1,6 @@
 # No tracking
 rawdata/*fastq
+rawdata/*fastq.gz
 rawdata/*bam
+rawdata/*bam.gz
+rawdata/md5.txt
