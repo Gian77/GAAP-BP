@@ -33,33 +33,26 @@ else
 		echo -e "\n========== Assembling genome: $file ==========\n" 
 		conda activate flye
 		echo -e "Flye version: `flye --version`" 
-		
-		if [[ "$file" == *"$STRING"* ]];then
 
-			flye \
-				--threads $cores \
-				--pacbio-hifi $file \
-				--out-dir $project_dir/outputs/03_assembly_flye/${file/.fastq//} \
-				--scaffold \
-				--meta \
-				--plasmids
-		else 
-			flye \
-				--threads $cores \
-				--pacbio-raw $file \
-				--out-dir $project_dir/outputs/03_assembly_flye/${file/.fastq//} \
-				--scaffold \
-				--meta \
-				--plasmids
-		fi;		
+		flye \
+			--threads $cores \
+			--pacbio-hifi $file \
+			--out-dir $project_dir/outputs/03_assembly_flye/${file/.fastq//} \
+			--scaffold \
+			--meta \
+			--plasmids	
 
 		conda deactivate
 	done;
 fi
 
+# Check if a string is present in a file name: if [[ "$file" == *"$STRING"* ]];then
+# --meta I removed meta from the flags
 # --min-overlap  In the latest Flye versions, this parameter is chosen automatically based on the read length distribution (reads N90) and does not require manual setting.
 # --iterations  By default, Flye runs one polishing iteration. Additional iterations might correct a small number of extra errors (due to improvements on how reads may align to the corrected assembly)
 # --meta and --plasmids options - this should capture both chromosomal and plasmid sequence
+# --asm-coverage 50 \
+# --genome-size 5m \
 echo -e "\n========== Sbatch log ==========\n"
 echo -e "\n Current directory: `pwd` \n"
 echo -e "\n `sacct -u $MSUusername -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
